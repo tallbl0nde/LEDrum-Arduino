@@ -1,6 +1,6 @@
 // Defining Pins
-#define pin_snare 8
-#define pin_high 9
+#define pin_snare 6
+#define pin_high 7
 #define pin_low 10
 #define pin_floor 11
 #define pin_bass 12
@@ -16,6 +16,7 @@
 #define pzo_bass A3
 
 // Defining settings
+#define drum_bright_min 40.0
 #define drum_bright_max 700.0
 #define drum_bright_fix 200.0
 #define drum_hit_fix 80.0
@@ -139,7 +140,7 @@ void loop(){
             }
             for (byte i = 0; i < 5; i++){
                 analogWrite(pin_out[i], byte(255 * (drum_level[i]/drum_bright_max)));
-                if (drum_level[i] >= drum_hit_min[i]){
+                if (drum_level[i] >= drum_bright_min){
                     drum_level[i] -= 20*exp(drum_level[i]/500);
                 } else {
                     drum_level[i] = 0;
