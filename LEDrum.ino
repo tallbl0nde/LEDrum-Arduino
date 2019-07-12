@@ -1,3 +1,10 @@
+// Libraries
+#include <Arduino.h>
+#include <U8g2lib.h>
+
+// Classes (screens)
+#include "settings.h"
+
 /* #region Definitions */
 // Pins
 #define pin_snare 6
@@ -16,6 +23,11 @@
 #define pzo_floor A4
 #define pzo_bass A3
 
+#define button_up 33
+#define button_down 35
+#define button_back 37
+#define button_ok 39
+
 // Settings
 #define drum_bright_min 40.0
 #define drum_bright_max 700.0
@@ -31,6 +43,9 @@
 #define blue 250
 /* #endregion */
 
+// Setup display
+U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, 53, U8X8_PIN_NONE);
+
 // Declaring variables
 const byte pin_out[5] = {pin_snare, pin_high, pin_low, pin_floor, pin_bass};
 const byte pin_in[5] = {pzo_snare, pzo_high, pzo_low, pzo_floor, pzo_bass};
@@ -38,6 +53,10 @@ const int drum_hit_min[5] = {120, 110, 100, 300, 40};
 
 int drum_level[5] = {0, 0, 0, 0, 0};
 int piezo_level[5] = {0, 0, 0, 0, 0};
+
+const byte button_pin[4] = {button_up, button_down, button_back, button_ok};
+int button_state[4] = {HIGH, HIGH, HIGH, HIGH};
+int button_last[4] = {HIGH, HIGH, HIGH, HIGH};
 
 byte rgb[3] = {0, 0, 0};
 
@@ -49,6 +68,15 @@ byte mode = 2;
 // Stores last mode (used to handle a change)
 byte mode_last = 5;
 
+// Screen index to draw
+byte screen_num = 0;
+// Indicates whether to redraw screen or not
+bool screen_update = true;
+
+// Stores screen objects
+Screen * screens[1];
+Screen_Settings scr_settings;
+
 void setup(){
     // Setup Pins
     for (byte i = 0; i < 5; i++){
@@ -59,8 +87,19 @@ void setup(){
     pinMode(pin_green, OUTPUT);
     pinMode(pin_blue, OUTPUT);
 
+    pinMode(button_up, INPUT_PULLUP);
+    pinMode(button_down, INPUT_PULLUP);
+    pinMode(button_back, INPUT_PULLUP);
+    pinMode(button_ok, INPUT_PULLUP);
+
     update_ms = millis();
     idle_ms = millis();
+
+    // Display
+    u8g2.begin();
+
+    // Assign screens
+    screens[0] = &scr_settings;
 }
 
 void loop(){
@@ -96,6 +135,23 @@ void loop(){
     // Set idle if nothing happens after set interval
     if (mode != 0 && (millis() - idle_ms) > idle_timeout){
         mode = 0;
+    }
+
+    // Update screen when requested
+    if (screen_update){
+        u8g2.clearBuffer();
+        screens[screen_num]->draw(u8g2);
+        u8g2.sendBuffer();
+        screen_update = false;
+    }
+
+    // Handle button presses and send to screen object
+    for (byte i = 0; i < 4; i++){
+        button_state[i] = digitalRead(button_pin[i]);
+        if (button_state[i] == LOW && button_state[i] != button_last[i]){
+            screens[screen_num]->button_pressed(i);
+        }
+        button_last[i] = button_state[i];
     }
 }
 
