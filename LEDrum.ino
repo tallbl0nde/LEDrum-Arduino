@@ -1,8 +1,11 @@
 // Libraries
 #include <Arduino.h>
 #include <U8g2lib.h>
+#include "setting.h"
 
 // Classes (screens)
+#include "lighting.h"
+#include "rgbselect.h"
 #include "settings.h"
 
 /* #region Definitions */
@@ -40,18 +43,6 @@
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, 53, U8X8_PIN_NONE);
 
 // Declaring variables
-struct settings {
-    int lighting_mode;
-    int lighting_solid_rgb[3];
-    int lighting_fade_speed;
-    int lighting_shift_speed;
-    int idle_timeout;
-    int idle_mode;
-    int idle_animate_speed;
-    int sensitivity[5];
-    int backlight_brightness;
-} setting;
-
 const byte pin_out[5] = {pin_snare, pin_high, pin_low, pin_floor, pin_bass};
 const byte pin_in[5] = {pzo_snare, pzo_high, pzo_low, pzo_floor, pzo_bass};
 int drum_level[5] = {0, 0, 0, 0, 0};
@@ -79,9 +70,12 @@ byte screen_num = 0;
 // Indicates whether to redraw screen or not
 bool screen_update = true;
 
+struct settings setting;
 // Stores screen objects
-Screen * screens[1];
-Screen_Settings scr_settings;
+Screen * screens[3];
+Screen_Settings scr_settings(&setting);
+Screen_Lighting scr_lighting(&setting);
+Screen_RGBSelect scr_rgbselect(&setting);
 
 void setup(){
     // Setup Pins
@@ -123,6 +117,8 @@ void setup(){
 
     // Assign screens
     screens[0] = &scr_settings;
+    screens[1] = &scr_lighting;
+    screens[2] = &scr_rgbselect;
 }
 
 void loop(){
