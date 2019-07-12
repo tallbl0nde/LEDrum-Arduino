@@ -10,7 +10,7 @@ void setup_idle(){
 }
 
 void loop_idle(){
-    if ((millis() - update_ms) > update_interval){
+    if ((millis() - fade_ms) > setting.idle_animate_speed){
         // Transition through all colours
         switch (idle_state){
             case 0:
@@ -84,7 +84,7 @@ void loop_idle(){
                 }
                 break;
         }
-        update_ms = millis();
+        fade_ms = millis();
     }
 
     // Read values
@@ -97,7 +97,7 @@ void loop_idle(){
     for (byte i = 0; i < 5; i++){
         if (piezo_level[i] > drum_idle_fix){
             idle_ms = millis();
-            mode = 1;
+            is_idle = false;
         }
     }
 }
@@ -105,12 +105,12 @@ void loop_idle(){
 
 /* #region Solid Colour */
 void setup_drum_solid(){
-    writeRGB(red, green, blue);
+    writeRGB(setting.lighting_solid_rgb[0], setting.lighting_solid_rgb[1], setting.lighting_solid_rgb[2]);
     allOff();
 }
 
 void loop_drum_solid(){
-    if ((millis() - update_ms) >= update_interval){
+    if ((millis() - fade_ms) >= setting.lighting_fade_speed){
         // Read values
         for (byte i = 0; i < 5; i++){
             int tmp = analogRead(pin_in[i]);
@@ -121,7 +121,7 @@ void loop_drum_solid(){
         byte idx = 6;
         int mx = 0;
         for (byte i = 0; i < 5; i++){
-            if (piezo_level[i] > mx && piezo_level[i] > drum_hit_min[i]){
+            if (piezo_level[i] > mx && piezo_level[i] > setting.sensitivity[i]){
                 idx = i;
                 idle_ms = millis();
             }
@@ -140,7 +140,7 @@ void loop_drum_solid(){
             }
         }
 
-        update_ms = millis();
+        fade_ms = millis();
     }
 }
 /* #endregion */
@@ -156,7 +156,7 @@ void setup_drum_rgb(){
 
 void loop_drum_rgb(){
     // Set colour
-    if ((millis() - update_ms) > update_interval){
+    if ((millis() - shift_ms) > setting.lighting_shift_speed){
         // Transition through all colours
         switch (shift_state){
             case 0:
@@ -209,6 +209,10 @@ void loop_drum_rgb(){
                 break;
         }
 
+        shift_ms = millis();
+    }
+
+    if ((millis() - fade_ms) >= setting.lighting_fade_speed){
         // Read values
         for (byte i = 0; i < 5; i++){
             int tmp = analogRead(pin_in[i]);
@@ -219,7 +223,7 @@ void loop_drum_rgb(){
         byte idx = 6;
         int mx = 0;
         for (byte i = 0; i < 5; i++){
-            if (piezo_level[i] > mx && piezo_level[i] > drum_hit_min[i]){
+            if (piezo_level[i] > mx && piezo_level[i] > setting.sensitivity[i]){
                 idx = i;
                 idle_ms = millis();
             }
@@ -238,9 +242,7 @@ void loop_drum_rgb(){
             }
         }
 
-        update_ms = millis();
+        fade_ms = millis();
     }
-
-
 }
 /* #endregion */

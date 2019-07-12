@@ -34,23 +34,26 @@
 #define drum_bright_fix 200.0
 #define drum_hit_fix 80.0
 #define drum_idle_fix 110.0
-#define update_interval 15
-#define idle_timeout 4000
-
-// Default Colour
-#define red 0
-#define green 130
-#define blue 250
 /* #endregion */
 
 // Setup display
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, 53, U8X8_PIN_NONE);
 
 // Declaring variables
+struct settings {
+    int lighting_mode;
+    int lighting_solid_rgb[3];
+    int lighting_fade_speed;
+    int lighting_shift_speed;
+    int idle_timeout;
+    int idle_mode;
+    int idle_animate_speed;
+    int sensitivity[5];
+    int backlight_brightness;
+} setting;
+
 const byte pin_out[5] = {pin_snare, pin_high, pin_low, pin_floor, pin_bass};
 const byte pin_in[5] = {pzo_snare, pzo_high, pzo_low, pzo_floor, pzo_bass};
-const int drum_hit_min[5] = {120, 110, 100, 300, 40};
-
 int drum_level[5] = {0, 0, 0, 0, 0};
 int piezo_level[5] = {0, 0, 0, 0, 0};
 
@@ -58,15 +61,18 @@ const byte button_pin[4] = {button_up, button_down, button_back, button_ok};
 int button_state[4] = {HIGH, HIGH, HIGH, HIGH};
 int button_last[4] = {HIGH, HIGH, HIGH, HIGH};
 
+// Values to use for PWM
 byte rgb[3] = {0, 0, 0};
 
-unsigned long update_ms = 0;
+// Timers
+unsigned long fade_ms = 0;
 unsigned long idle_ms = 0;
+unsigned long shift_ms = 0;
 
-// Depicts which mode to execute
-byte mode = 2;
+// If in idle or not
+byte is_idle = false;
 // Stores last mode (used to handle a change)
-byte mode_last = 5;
+byte mode_last = 255;
 
 // Screen index to draw
 byte screen_num = 0;
@@ -86,14 +92,31 @@ void setup(){
     pinMode(pin_red, OUTPUT);
     pinMode(pin_green, OUTPUT);
     pinMode(pin_blue, OUTPUT);
-
     pinMode(button_up, INPUT_PULLUP);
     pinMode(button_down, INPUT_PULLUP);
     pinMode(button_back, INPUT_PULLUP);
     pinMode(button_ok, INPUT_PULLUP);
 
-    update_ms = millis();
+    fade_ms = millis();
     idle_ms = millis();
+    shift_ms = millis();
+
+    // Read settings
+    setting.lighting_mode = 0;
+    setting.lighting_solid_rgb[0] = 0;
+    setting.lighting_solid_rgb[1] = 130;
+    setting.lighting_solid_rgb[2] = 250;
+    setting.lighting_fade_speed = 15;
+    setting.lighting_shift_speed = 15;
+    setting.idle_timeout = 15000;
+    setting.idle_mode = 0;
+    setting.idle_animate_speed = 15;
+    setting.sensitivity[0] = 120;
+    setting.sensitivity[1] = 110;
+    setting.sensitivity[2] = 100;
+    setting.sensitivity[3] = 300;
+    setting.sensitivity[4] = 40;
+    setting.backlight_brightness = 100;
 
     // Display
     u8g2.begin();
@@ -103,38 +126,37 @@ void setup(){
 }
 
 void loop(){
-    // Prepare next mode if changed
-    if (mode != mode_last){
-        switch (mode){
+    if (!is_idle){
+        // Prepare next mode if changed
+        if (setting.lighting_mode != mode_last){
+            switch (setting.lighting_mode){
+                case 0:
+                    setup_drum_solid();
+                    break;
+                case 1:
+                    setup_drum_rgb();
+                    break;
+            }
+            mode_last = setting.lighting_mode;
+        }
+
+        // Execute appropriate mode
+        switch (setting.lighting_mode){
             case 0:
-                setup_idle();
+                loop_drum_solid();
                 break;
             case 1:
-                setup_drum_solid();
-                break;
-            case 2:
-                setup_drum_rgb();
+                loop_drum_rgb();
                 break;
         }
-        mode_last = mode;
-    }
 
-    // Execute appropriate mode
-    switch (mode){
-        case 0:
-            loop_idle();
-            break;
-        case 1:
-            loop_drum_solid();
-            break;
-        case 2:
-            loop_drum_rgb();
-            break;
-    }
-
-    // Set idle if nothing happens after set interval
-    if (mode != 0 && (millis() - idle_ms) > idle_timeout){
-        mode = 0;
+        // Set idle if nothing happens after set interval
+        if ((millis() - idle_ms) > setting.idle_timeout){
+            is_idle = true;
+            setup_idle();
+        }
+    } else {
+        loop_idle();
     }
 
     // Update screen when requested
