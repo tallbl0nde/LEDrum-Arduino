@@ -8,7 +8,7 @@ class Screen_Settings : public Screen{
         // Cursor position
         byte pos;
         // Menu items
-        const char * items[6];
+        const char * items[7];
 
     public:
         // Constructor to initalise private vars

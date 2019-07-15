@@ -11,18 +11,25 @@ Screen_Settings::Screen_Settings(struct settings * s) : Screen(s){
     this->items[3] = "Lighting";
     this->items[4] = "Miscellaneous";
     this->items[5] = "[SAVE]";
+    this->items[6] = " ";
 }
 
 void Screen_Settings::draw(U8G2_ST7920_128X64_F_HW_SPI u8g2){
     u8g2.setFont(u8g2_font_crox2hb_tr);
     u8g2.drawStr(1, 11, "Settings:");
     u8g2.setFont(u8g2_font_rosencrantz_nbp_tr);
-    for (byte i = 0; i < 6; i++){
-        // Draw indicator
-        if (this->pos == i){
-            u8g2.drawStr(1, 13 + ((i+1)*13), ">");
+    // No scroll
+    if (this->pos < 3){
+        for (byte i = 0; i < 4; i++){
+            u8g2.drawStr(11, 13 + ((i+1)*13), this->items[i]);
         }
-        u8g2.drawStr(11 ,13 + ((i+1)*13), this->items[i]);
+        u8g2.drawStr(1, 13 + ((this->pos+1)*13), ">");
+    } else {
+    // Scroll effect
+        for (byte i = this->pos-2; i < this->pos+2; i++){
+            u8g2.drawStr(11, 13 + ((i-(this->pos-3))*13), this->items[i]);
+        }
+        u8g2.drawStr(1, 52, ">");
     }
 }
 
