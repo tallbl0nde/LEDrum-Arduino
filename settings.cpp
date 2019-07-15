@@ -63,7 +63,8 @@ void Screen_Settings::button_pressed(byte b){
                     break;
                 case 1:
                     // Drum Sensitivity
-
+                    screen_num = 2;
+                    screen_update = true;
                     break;
                 case 2:
                     // Idle Options

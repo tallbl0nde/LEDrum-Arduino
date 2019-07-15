@@ -8,6 +8,7 @@
 #include "idle.h"
 #include "lighting.h"
 #include "rgbselect.h"
+#include "sensitivity.h"
 #include "settings.h"
 
 /* #region Definitions */
@@ -82,6 +83,7 @@ Screen_Idle scr_idle(&setting);
 Screen_Lighting scr_lighting(&setting);
 Screen_RGBSelect scr_rgbselect(&setting);
 Screen_Settings scr_settings(&setting);
+Screen_Sensitivity scr_sensitivity(&setting);
 
 void setup(){
     // Setup Pins
@@ -124,7 +126,7 @@ void setup(){
     // Assign screens
     screens[0] = &scr_settings;
     screens[1] = &scr_backlight;
-    // screens[2] = ;
+    screens[2] = &scr_sensitivity;
     screens[3] = &scr_idle;
     screens[4] = &scr_lighting;
     screens[5] = &scr_rgbselect;
