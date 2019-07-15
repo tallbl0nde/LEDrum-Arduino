@@ -7,6 +7,7 @@
 #include "lighting.h"
 #include "rgbselect.h"
 #include "settings.h"
+#include "idle.h"
 
 /* #region Definitions */
 // Pins
@@ -72,10 +73,11 @@ bool screen_update = true;
 
 struct settings setting;
 // Stores screen objects
-Screen * screens[3];
+Screen * screens[4];
 Screen_Settings scr_settings(&setting);
 Screen_Lighting scr_lighting(&setting);
 Screen_RGBSelect scr_rgbselect(&setting);
+Screen_Idle scr_idle(&setting);
 
 void setup(){
     // Setup Pins
@@ -103,7 +105,6 @@ void setup(){
     setting.lighting_fade_speed = 15;
     setting.lighting_shift_speed = 15;
     setting.idle_timeout = 15000;
-    setting.idle_mode = 0;
     setting.idle_animate_speed = 15;
     setting.sensitivity[0] = 120;
     setting.sensitivity[1] = 110;
@@ -119,6 +120,7 @@ void setup(){
     screens[0] = &scr_settings;
     screens[1] = &scr_lighting;
     screens[2] = &scr_rgbselect;
+    screens[3] = &scr_idle;
 }
 
 void loop(){
@@ -132,6 +134,9 @@ void loop(){
                 case 1:
                     setup_drum_rgb();
                     break;
+                case 2:
+                    setup_drum_select();
+                    break;
             }
             mode_last = setting.lighting_mode;
         }
@@ -144,15 +149,18 @@ void loop(){
             case 1:
                 loop_drum_rgb();
                 break;
+            case 2:
+                loop_drum_select();
+                break;
         }
 
         // Set idle if nothing happens after set interval
         if ((millis() - idle_ms) > setting.idle_timeout){
             is_idle = true;
-            setup_idle();
+            setup_idle_shift();
         }
     } else {
-        loop_idle();
+        loop_idle_shift();
     }
 
     // Update screen when requested

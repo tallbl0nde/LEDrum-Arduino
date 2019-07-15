@@ -1,15 +1,15 @@
-/* #region Idle Mode */
+/* #region Idle Shift */
 byte idle_drum;
 byte idle_state;
 
-void setup_idle(){
+void setup_idle_shift(){
     writeRGB(0, 0, 0);
     allOff();
     idle_drum = 0;
     idle_state = 0;
 }
 
-void loop_idle(){
+void loop_idle_shift(){
     if ((millis() - fade_ms) > setting.idle_animate_speed){
         // Transition through all colours
         switch (idle_state){
@@ -243,6 +243,26 @@ void loop_drum_rgb(){
         }
 
         fade_ms = millis();
+    }
+}
+/* #endregion */
+
+/* #region Solid RGB Select */
+void setup_drum_select(){
+    writeRGB(setting.lighting_solid_rgb[0], setting.lighting_solid_rgb[1], setting.lighting_solid_rgb[2]);
+    allOff();
+    analogWrite(pin_out[0], 255);
+}
+
+void loop_drum_select(){
+    if ((millis() - fade_ms) >= setting.lighting_fade_speed){
+        if (rgb[0] != setting.lighting_solid_rgb[0] || rgb[1] != setting.lighting_solid_rgb[1] || rgb[2] != setting.lighting_solid_rgb[2]){
+            writeRGB(setting.lighting_solid_rgb[0], setting.lighting_solid_rgb[1], setting.lighting_solid_rgb[2]);
+        }
+        fade_ms = millis();
+
+        // Need this to prevent entering idle mode
+        idle_ms = millis();
     }
 }
 /* #endregion */

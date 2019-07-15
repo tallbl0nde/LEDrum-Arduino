@@ -81,7 +81,7 @@ void Screen_RGBSelect::button_pressed(byte b){
                     // Back
                     screen_num = 1;
                     screen_update = true;
-                    // reset light mode
+                    this->setting->lighting_mode = 0;
                     break;
                 case 3:
                     // OK

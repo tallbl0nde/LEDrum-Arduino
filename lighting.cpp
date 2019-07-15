@@ -78,7 +78,12 @@ void Screen_Lighting::button_pressed(byte b){
                             screen_update = true;
                             break;
                         case 2:
-                            (this->setting->lighting_mode == 1) ? this->sel_pos = this->pos : screen_num = 2;
+                            if (this->setting->lighting_mode == 1){
+                                this->sel_pos = this->pos;
+                            } else {
+                                screen_num = 2;
+                                this->setting->lighting_mode = 2;
+                            }
                             screen_update = true;
                             break;
                     }
