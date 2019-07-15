@@ -5,10 +5,10 @@ extern bool screen_update;
 
 Screen_Settings::Screen_Settings(struct settings * s) : Screen(s){
     this->pos = 0;
-    this->items[0] = "Lighting";
-    this->items[1] = "Idle";
-    this->items[2] = "Drum Sensitivity";
-    this->items[3] = "Backlight";
+    this->items[0] = "Backlight";
+    this->items[1] = "Drum Sensitivity";
+    this->items[2] = "Idle";
+    this->items[3] = "Lighting";
     this->items[4] = "Miscellaneous";
     this->items[5] = "[SAVE]";
 }
@@ -50,22 +50,23 @@ void Screen_Settings::button_pressed(byte b){
             // OK
             switch (pos){
                 case 0:
-                    // Lighting Mode
+                    // Backlight
                     screen_num = 1;
                     screen_update = true;
                     break;
                 case 1:
+                    // Drum Sensitivity
+
+                    break;
+                case 2:
                     // Idle Options
                     screen_num = 3;
                     screen_update = true;
                     break;
-                case 2:
-                    // Drum Sensitivity
-
-                    break;
                 case 3:
-                    // Backlight
-
+                    // Lighting Mode
+                    screen_num = 4;
+                    screen_update = true;
                     break;
                 case 4:
                     // Miscellaneous

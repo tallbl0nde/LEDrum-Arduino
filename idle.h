@@ -10,9 +10,9 @@ class Screen_Idle : public Screen{
         // Selected position
         byte sel_pos;
 
-        // Handle buttons when second entry Selected
+        // Handle buttons when first entry Selected
         void button_first(byte);
-        // Handle buttons when third entry selected
+        // Handle buttons when second entry selected
         void button_second(byte);
 
     public:

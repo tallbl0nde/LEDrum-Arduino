@@ -4,10 +4,11 @@
 #include "setting.h"
 
 // Classes (screens)
+#include "backlight.h"
+#include "idle.h"
 #include "lighting.h"
 #include "rgbselect.h"
 #include "settings.h"
-#include "idle.h"
 
 /* #region Definitions */
 // Pins
@@ -16,6 +17,8 @@
 #define pin_low 10
 #define pin_floor 11
 #define pin_bass 12
+
+#define pin_backlight 8
 
 #define pin_red 4
 #define pin_green 3
@@ -73,11 +76,12 @@ bool screen_update = true;
 
 struct settings setting;
 // Stores screen objects
-Screen * screens[4];
-Screen_Settings scr_settings(&setting);
+Screen * screens[7];
+Screen_Backlight scr_backlight(&setting);
+Screen_Idle scr_idle(&setting);
 Screen_Lighting scr_lighting(&setting);
 Screen_RGBSelect scr_rgbselect(&setting);
-Screen_Idle scr_idle(&setting);
+Screen_Settings scr_settings(&setting);
 
 void setup(){
     // Setup Pins
@@ -115,12 +119,16 @@ void setup(){
 
     // Display
     u8g2.begin();
+    setBacklight(setting.backlight_brightness);
 
     // Assign screens
     screens[0] = &scr_settings;
-    screens[1] = &scr_lighting;
-    screens[2] = &scr_rgbselect;
+    screens[1] = &scr_backlight;
+    // screens[2] = ;
     screens[3] = &scr_idle;
+    screens[4] = &scr_lighting;
+    screens[5] = &scr_rgbselect;
+    // screens[6] = ;
 }
 
 void loop(){
@@ -197,4 +205,10 @@ void allOff(){
     for (byte i = 0; i < 5; i++){
         analogWrite(pin_out[i], 0);
     }
+}
+
+// Adjust PWM for screen brightness
+void setBacklight(byte b){
+    setting.backlight_brightness = b;
+    analogWrite(pin_backlight, byte(255 * b/100.0));
 }
