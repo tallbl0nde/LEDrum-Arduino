@@ -11,6 +11,12 @@ struct settings {
     int idle_animate_speed;
     int sensitivity[5];
     byte backlight_brightness;
+    int miscellaneous[5];
+    // 0: brightness_min;
+    // 1: brightness_max;
+    // 2: brightness_fix;
+    // 3: hit_fix;
+    // 4: idle_fix;
 };
 
 #endif

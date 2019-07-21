@@ -78,7 +78,8 @@ void Screen_Settings::button_pressed(byte b){
                     break;
                 case 4:
                     // Miscellaneous
-
+                    screen_num = 6;
+                    screen_update = true;
                     break;
                 case 5:
                     // Save

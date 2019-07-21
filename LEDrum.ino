@@ -7,12 +7,12 @@
 #include "backlight.h"
 #include "idle.h"
 #include "lighting.h"
+#include "misc.h"
 #include "rgbselect.h"
 #include "sensitivity.h"
 #include "settings.h"
 
 /* #region Definitions */
-// Pins
 #define pin_snare 6
 #define pin_high 7
 #define pin_low 10
@@ -35,13 +35,6 @@
 #define button_down 35
 #define button_back 37
 #define button_ok 39
-
-// Settings
-#define drum_bright_min 40.0
-#define drum_bright_max 700.0
-#define drum_bright_fix 200.0
-#define drum_hit_fix 80.0
-#define drum_idle_fix 110.0
 /* #endregion */
 
 // Setup display
@@ -81,6 +74,7 @@ Screen * screens[7];
 Screen_Backlight scr_backlight(&setting);
 Screen_Idle scr_idle(&setting);
 Screen_Lighting scr_lighting(&setting);
+Screen_Misc scr_misc(&setting);
 Screen_RGBSelect scr_rgbselect(&setting);
 Screen_Settings scr_settings(&setting);
 Screen_Sensitivity scr_sensitivity(&setting);
@@ -118,6 +112,11 @@ void setup(){
     setting.sensitivity[3] = 300;
     setting.sensitivity[4] = 40;
     setting.backlight_brightness = 100;
+    setting.miscellaneous[0] = 40.0;
+    setting.miscellaneous[1] = 700.0;
+    setting.miscellaneous[2] = 200.0;
+    setting.miscellaneous[3] = 80.0;
+    setting.miscellaneous[4] = 110.0;
 
     // Display
     u8g2.begin();
@@ -130,7 +129,7 @@ void setup(){
     screens[3] = &scr_idle;
     screens[4] = &scr_lighting;
     screens[5] = &scr_rgbselect;
-    // screens[6] = ;
+    screens[6] = &scr_misc;
 }
 
 void loop(){

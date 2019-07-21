@@ -95,7 +95,7 @@ void loop_idle_shift(){
 
     // If hit break out of idle mode
     for (byte i = 0; i < 5; i++){
-        if (piezo_level[i] > drum_idle_fix){
+        if (piezo_level[i] > setting.miscellaneous[4]){
             idle_ms = millis();
             is_idle = false;
         }
@@ -129,11 +129,11 @@ void loop_drum_solid(){
 
         // Set brightnesses
         if (idx != 6){
-            drum_level[idx] = drum_bright_max;
+            drum_level[idx] = setting.miscellaneous[1];
         }
         for (byte i = 0; i < 5; i++){
-            analogWrite(pin_out[i], byte(255 * (drum_level[i] / drum_bright_max)));
-            if (drum_level[i] >= drum_bright_min){
+            analogWrite(pin_out[i], byte(255 * (drum_level[i] / setting.miscellaneous[1])));
+            if (drum_level[i] >= setting.miscellaneous[0]){
                 drum_level[i] -= 20 * exp(drum_level[i] / 500);
             } else {
                 drum_level[i] = 0;
@@ -231,11 +231,11 @@ void loop_drum_rgb(){
 
         // Set brightnesses
         if (idx != 6){
-            drum_level[idx] = drum_bright_max;
+            drum_level[idx] = setting.miscellaneous[1];
         }
         for (byte i = 0; i < 5; i++){
-            analogWrite(pin_out[i], byte(255 * (drum_level[i] / drum_bright_max)));
-            if (drum_level[i] >= drum_bright_min){
+            analogWrite(pin_out[i], byte(255 * (drum_level[i] / setting.miscellaneous[1])));
+            if (drum_level[i] >= setting.miscellaneous[0]){
                 drum_level[i] -= 20 * exp(drum_level[i] / 500);
             } else {
                 drum_level[i] = 0;

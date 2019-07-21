@@ -79,7 +79,7 @@ void Screen_RGBSelect::button_pressed(byte b){
                     break;
                 case 2:
                     // Back
-                    screen_num = 1;
+                    screen_num = 4;
                     screen_update = true;
                     this->setting->lighting_mode = 0;
                     break;
